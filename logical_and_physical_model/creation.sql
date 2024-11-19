@@ -72,14 +72,16 @@ CREATE TABLE instructor_availability(
         CHECK(start_time < end_time)
 );
 
--- WE NEED TO ENSURE THAT STARTING_DATE IS < THAN ENDING_DATE
+-- WE NEED TO ENSURE THAT STARTING_DATE < ENDING_DATE
 CREATE TABLE rental(
         rental_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         starting_date DATE NOT NULL,
         ending_date   DATE NOT NULL,
         student_id INT NOT NULL,
-        FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE,
-       -- CHECK(starting_date < ending_date AND ending_date <= starting_date + INTERVALL '12 months')
+        FOREIGN KEY(student_id) REFERENCES student(id) ON DELETE CASCADE,
+        CONSTRAINT lease_max_duration CHECK (
+                (ending_date- starting_date)/30<=12
+        )
 );
 
 
@@ -198,3 +200,36 @@ CREATE TABLE time_slot(
         PRIMARY KEY(starting_time, ending_time, date_slot,lesson_id)
 );
 
+
+
+
+
+--keep only 2 instruments for each student
+CREATE OR REPLACE FUNCTION rental_instruments_limit()
+RETURNS TRIGGER AS $$
+DECLARE instrument_count INT;
+BEGIN
+
+        SELECT COUNT(rental_instrument.instrument_id)
+        INTO instrument_count
+        FROM rental_instrument
+        JOIN rental ON rental_instrument.rental_id=rental.id
+        WHERE rental.student_id=(
+                        SELECT student_id FROM rental WHERE id=NEW.rental_id
+                ) AND rental.starting_date<=(
+                        SELECT ending_date FROM rental WHERE id= NEW.rental_id
+                ) AND rental.ending_date>=(
+                        SELECT starting_date FROM rental WHERE id=NEW.rental_id
+                );
+        -- if the student tries to rent more than 2:
+        IF (instrument_count>=2) THEN RAISE EXCEPTION 'MAXIMUM NUMBER OF RENTED INSTURMENTS IS 2 PER STUDENT!' 
+        END IF;
+        RETURN NEW;
+        END;
+
+        $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER rental_instruments_limit_trigger
+        BEFORE INSERT ON rental_instrument
+        FOR EACH ROW
+        EXECUTE FUNCTION rental_instrument_limit();

@@ -47,10 +47,11 @@ CREATE TABLE phone(
         PRIMARY KEY(phone_num, person_id)
 );
 ---- need to be changed ----
-CREATE TABLE sibling(
-        sibling_student_id INT GENERATED ALWAYS AS IDENTITY,
+CREATE TABLE sibling_student(
+        sibling_student_id INT NOT NULL,
         student_id INT NOT NULL,
         FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE,
+        FOREIGN KEY (sibling_student_id) REFERENCES student(student_id) ON DELETE CASCADE,
         PRIMARY KEY(sibling_student_id,student_id)
 );
 
@@ -78,7 +79,7 @@ CREATE TABLE rental(
         starting_date DATE NOT NULL,
         ending_date   DATE NOT NULL,
         student_id INT NOT NULL,
-        FOREIGN KEY(student_id) REFERENCES student(id) ON DELETE CASCADE,
+        FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE,
         CONSTRAINT lease_max_duration CHECK (
                 (ending_date- starting_date)/30<=12
         )
@@ -124,8 +125,8 @@ CREATE TABLE price_list(
         price VARCHAR(50) NOT NULL,       --NOT NULL?? Yes it should be not null,
         lesson_type_id INT NOT NULL,
         skill_level_id INT NOT NULL,  --- 
-        FOREIGN KEY (lesson_type_id) REFERENCES lesson_type_lookup(lesson_type_lookup_id),
-        FOREIGN KEY (skill_level_id) REFERENCES skill_level_lookup(skill_level_lookup_id)
+        FOREIGN KEY (lesson_type_lookup_id) REFERENCES lesson_type_lookup(lesson_type_lookup_id),
+        FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id)
 );
 
 
@@ -154,9 +155,9 @@ CREATE TABLE instrument_instructor(
 CREATE TABLE ensemble(
     lesson_id INT NOT NULL,
     genre VARCHAR(500) NOT NULL,
-    min_num_of_students INT NOT NULL, -- why we do not store them as INT ??
-    max_num_of_students INT NOT NULL, -- why we do not store them as INT ??
-    student_count INT NOT NULL DEFAULT 0, -- why we do not store them as INT ??
+    min_num_of_students INT NOT NULL,
+    max_num_of_students INT NOT NULL, 
+    student_count INT NOT NULL DEFAULT 0, 
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
     CHECK (min_num_of_students <= max_num_of_students),
@@ -168,12 +169,12 @@ CREATE TABLE ensemble(
 CREATE TABLE group_lesson(
     lesson_id INT NOT NULL,
     skill_level_id INT NOT NULL,
-    min_num_of_students INT NOT NULL, -- why we do not store them as INT ??
-    max_num_of_students INT NOT NULL,   -- why we do not store them as INT ??
-    student_count INT NOT NULL DEFAULT 0, -- why we do not store them as INT ??
+    min_num_of_students INT NOT NULL,
+    max_num_of_students INT NOT NULL,   
+    student_count INT NOT NULL DEFAULT 0, 
     instrument_used VARCHAR(500),
     FOREIGN KEY (lesson_id) REFERENCES lesson(id) ON DELETE CASCADE,
-    FOREIGN KEY (skill_level_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
+    FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
     CHECK (min_num_of_students <= max_num_of_students),
     CHECK (student_count<= max_num_of_students)
@@ -185,7 +186,7 @@ CREATE TABLE individual_lesson(
     lesson_id INT NOT NULL,
     skill_level_id INT NOT NULL,
     FOREIGN KEY (lesson_id) REFERENCES lesson(id) ON DELETE CASCADE,
-    FOREIGN KEY (skill_level_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
+    FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
     PRIMARY KEY (lesson_id)
 );
 
@@ -198,6 +199,7 @@ CREATE TABLE time_slot(
         lesson_id INT NOT NULL,
         FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
         PRIMARY KEY(starting_time, ending_time, date_slot,lesson_id)
+        CHECK(starting_time < ending_time)
 );
 
 

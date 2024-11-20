@@ -14,7 +14,7 @@ CREATE TABLE student(
         level_skills      VARCHAR(50) NOT NULL,
         contact_person_id INT,
         person_id         INT NOT NULL,
-        FOREIGN KEY (contact_person_id) REFERENCES contact_person(contact_person_id),
+        FOREIGN KEY (contact_person_id) REFERENCES contact_person(contact_person_id) ON DELETE SET NULL,
         FOREIGN KEY (person_id) REFERENCES person(person_id) ON DELETE CASCADE
 );
 

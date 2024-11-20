@@ -93,7 +93,7 @@ CREATE TABLE instrument(
         rental_price VARCHAR(50),
         type_of_instrument  VARCHAR(500) NOT NULL,
         brand        VARCHAR(500) NOT NULL,
-        quantity     INT CHECK(quantity > 0)
+        quantity     INT NOT NULL CHECK(quantity > 0)
 );
 
 
@@ -114,8 +114,8 @@ CREATE TABLE lesson(
         lesson_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         instructor_id INT NOT NULL,                                 
         price_list_id INT NOT NULL,
-        FOREIGN KEY(instructor_id) REFERENCES instructor(instructor_id),
-        FOREIGN KEY(price_list_id) REFERENCES price_list(price_list_id)
+        FOREIGN KEY(instructor_id) REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+        FOREIGN KEY(price_list_id) REFERENCES price_list(price_list_id) ON DELETE CASCADE
 );
 
 
@@ -124,9 +124,10 @@ CREATE TABLE price_list(
         price_list_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         price VARCHAR(50) NOT NULL,       --NOT NULL?? Yes it should be not null,
         lesson_type_id INT NOT NULL,
-        skill_level_id INT NOT NULL,  --- 
-        FOREIGN KEY (lesson_type_lookup_id) REFERENCES lesson_type_lookup(lesson_type_lookup_id),
-        FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id)
+        skill_level_id INT,  --- 
+        date_price DATE NOT NULL,
+        FOREIGN KEY (lesson_type_lookup_id) REFERENCES lesson_type_lookup(lesson_type_lookup_id) ON DELETE CASCADE,
+        FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE
 );
 
 

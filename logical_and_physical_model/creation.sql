@@ -9,13 +9,23 @@ CREATE TABLE person(
         zip          VARCHAR(50)
 );
 
-CREATE TABLE student(
-        student_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        level_skills      VARCHAR(50) NOT NULL,
-        contact_person_id INT,
-        person_id         INT NOT NULL,
-        FOREIGN KEY (contact_person_id) REFERENCES contact_person(contact_person_id) ON DELETE SET NULL,
-        FOREIGN KEY (person_id) REFERENCES person(person_id) ON DELETE CASCADE
+CREATE TABLE lesson_type_lookup(
+        lesson_type_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        lesson_type VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE skill_level_lookup(
+        skill_level_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        skill_level VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE phone(
+        phone_num VARCHAR(50) NOT NULL,
+        person_id INT NOT NULL,
+        FOREIGN KEY(person_id) REFERENCES person(person_id) ON DELETE CASCADE,
+        PRIMARY KEY(phone_num, person_id)
 );
 
 
@@ -33,6 +43,18 @@ CREATE TABLE contact_phone(
         PRIMARY KEY(phone_nb, contact_person_id)
 );
 
+
+
+CREATE TABLE student(
+        student_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        level_skills      VARCHAR(50) NOT NULL,
+        contact_person_id INT,
+        person_id         INT NOT NULL,
+        FOREIGN KEY (contact_person_id) REFERENCES contact_person(contact_person_id) ON DELETE SET NULL,
+        FOREIGN KEY (person_id) REFERENCES person(person_id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE instructor(
         instructor_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         employment_id VARCHAR(500) UNIQUE NOT NULL,
@@ -40,12 +62,6 @@ CREATE TABLE instructor(
         FOREIGN KEY(person_id) REFERENCES person(person_id) ON DELETE CASCADE
 );
 
-CREATE TABLE phone(
-        phone_num VARCHAR(50) NOT NULL,
-        person_id INT NOT NULL,
-        FOREIGN KEY(person_id) REFERENCES person(person_id) ON DELETE CASCADE,
-        PRIMARY KEY(phone_num, person_id)
-);
 ---- need to be changed ----
 CREATE TABLE sibling_student(
         sibling_student_id INT NOT NULL,
@@ -107,19 +123,6 @@ CREATE TABLE rental_instrument(
 );
 
 
-
-
-
-CREATE TABLE lesson(
-        lesson_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        instructor_id INT NOT NULL,                                 
-        price_list_id INT NOT NULL,
-        FOREIGN KEY(instructor_id) REFERENCES instructor(instructor_id) ON DELETE CASCADE,
-        FOREIGN KEY(price_list_id) REFERENCES price_list(price_list_id) ON DELETE CASCADE
-);
-
-
-
 CREATE TABLE price_list(
         price_list_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         price VARCHAR(50) NOT NULL,    
@@ -132,16 +135,16 @@ CREATE TABLE price_list(
 
 
 
-CREATE TABLE lesson_type_lookup(
-        lesson_type_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        lesson_type VARCHAR(50) NOT NULL
+
+CREATE TABLE lesson(
+        lesson_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        instructor_id INT NOT NULL,                                 
+        price_list_id INT NOT NULL,
+        FOREIGN KEY(instructor_id) REFERENCES instructor(instructor_id) ON DELETE CASCADE,
+        FOREIGN KEY(price_list_id) REFERENCES price_list(price_list_id) ON DELETE CASCADE
 );
 
 
-CREATE TABLE skill_level_lookup(
-        skill_level_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        skill_level VARCHAR(50) NOT NULL
-);
 
 
 
@@ -160,7 +163,7 @@ CREATE TABLE ensemble(
     max_num_of_students INT NOT NULL, 
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
-    CHECK (min_num_of_students <= max_num_of_students),
+    CHECK (min_num_of_students <= max_num_of_students)
 );
 
 
@@ -174,7 +177,7 @@ CREATE TABLE group_lesson(
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
-    CHECK (min_num_of_students <= max_num_of_students),
+    CHECK (min_num_of_students <= max_num_of_students)
 );
 
 
@@ -214,11 +217,11 @@ BEGIN
         FROM rental_instrument
         JOIN rental ON rental_instrument.rental_id=rental.rental_id
         WHERE rental.student_id=(
-                        SELECT student_id FROM rental WHERE id=NEW.rental_id
+                        SELECT student_id FROM rental WHERE rental_id=NEW.rental_id
                 ) AND rental.starting_date<=(
-                        SELECT ending_date FROM rental WHERE id= NEW.rental_id
+                        SELECT ending_date FROM rental WHERE rental_id= NEW.rental_id
                 ) AND rental.ending_date>=(
-                        SELECT starting_date FROM rental WHERE id=NEW.rental_id
+                        SELECT starting_date FROM rental WHERE rental_id=NEW.rental_id
                 );
         -- if the student tries to rent more than 2:
         IF (instrument_count>=2) THEN RAISE EXCEPTION 'MAXIMUM NUMBER OF RENTED INSTURMENTS IS 2 PER STUDENT!'; 

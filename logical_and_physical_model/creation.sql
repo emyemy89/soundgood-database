@@ -91,6 +91,7 @@ CREATE TABLE rental(
 CREATE TABLE instrument(
         instrument_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         rental_price VARCHAR(50),
+        instrument_name VARCHAR(50) NOT NULL,
         type_of_instrument  VARCHAR(500) NOT NULL,
         brand        VARCHAR(500) NOT NULL,
         quantity     INT NOT NULL CHECK(quantity > 0)
@@ -157,11 +158,9 @@ CREATE TABLE ensemble(
     genre VARCHAR(500) NOT NULL,
     min_num_of_students INT NOT NULL,
     max_num_of_students INT NOT NULL, 
-    student_count INT NOT NULL DEFAULT 0, 
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
     CHECK (min_num_of_students <= max_num_of_students),
-    CHECK (student_count <= max_num_of_students)
 );
 
 
@@ -171,13 +170,11 @@ CREATE TABLE group_lesson(
     skill_level_lookup_id INT NOT NULL,
     min_num_of_students INT NOT NULL,
     max_num_of_students INT NOT NULL,   
-    student_count INT NOT NULL DEFAULT 0, 
     instrument_used VARCHAR(500),
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
     CHECK (min_num_of_students <= max_num_of_students),
-    CHECK (student_count<= max_num_of_students)
 );
 
 

@@ -1,4 +1,18 @@
+---Lesson Type Lookup---
+INSERT INTO lesson_type_lookup (lesson_type)
+VALUES
+  ('individual_lesson'),
+  ('group_lesson'),
+  ('ensemble'),
 
+---Skill Level Lookup---
+INSERT INTO skill_level_lookup (skill_level)
+VALUES
+  ('beginner'),
+  ('intermediate'),
+  ('advanced'),
+
+  
 ---Person---
 INSERT INTO person (first_name, last_name, personal_num, email, city, address, postalZip)
 VALUES
@@ -11,6 +25,51 @@ VALUES
   ('Xander', 'Sellers', '22386551', 'laoreet.ipsum.curabitur@hotmail.ca', 'Krasnaya Yaruga', 'Ap #583-7729 Vivamus Rd.', '65348'),
   ('Jermaine', 'Gould', '39600999', 'quisque.libero.lacus@google.edu', 'Simon''s Town', 'Ap #693-1232 Nunc Street', '415537');
 
+---Contact Person---
+INSERT INTO contact_person (first_name, last_name, personal_num)
+VALUES
+  ('Walker', 'Wright', '366664815'),
+  ('Jakeem', 'Ashley', '313977692'),
+  ('Kirestin', 'Baxter', '491662182'),
+  ('Britanni', 'Wolf', '216042409');
+
+
+---Price List---
+INSERT INTO price_list (price, lesson_type_lookup_id, skill_level_lookup_id, date_price)
+VALUES
+  ('$3.25', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner', 'Apr 23, 2024'),
+  ('$89.19',SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'intermediate', 'Apr 23, 2024'),
+  ('$81.79', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'advanced', 'Apr 23, 2024'),
+  ('$68.47', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner', 'Apr 23, 2024'),
+  ('$49.93',  SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'intermediate', 'Apr 23, 2024'),
+  ('$96.52', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'advanced', 'Apr 23, 2024'),
+  ('$7.31',  SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble', null , 'Apr 23, 2024');
+
+
+
+---Instructor---
+INSERT INTO instructor (employment_id, person_id)
+VALUES
+  ('1774', SELECT person_id FROM person WHERE first_name = 'Lionel' AND last_name = 'Ferrell'),  
+  ('7155', SELECT person_id FROM person WHERE first_name = 'Xander' AND last_name = 'Sellers'),
+  ('2012', SELECT person_id FROM person WHERE first_name = 'Jermaine' AND last_name = 'Gould');
+
+
+---Lesson---
+INSERT INTO lesson (instructor_id, price_list_id)
+VALUES
+  ((SELECT instructor_id FROM instructor WHERE employment_id = '1774'), (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
+      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson')
+      AND skill_level_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), --individual
+  ((SELECT instructor_id FROM instructor WHERE employment_id = '7155'),  (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
+      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')
+      AND skill_level_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), --group lesson
+  ((SELECT instructor_id FROM instructor WHERE employment_id = '2012'),  (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
+      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')
+      AND skill_level_id = null)); -- ensemble 
+
+
+
 ---Phone---
 INSERT INTO phone (phone, person_id)
 VALUES
@@ -22,27 +81,53 @@ VALUES
   ('07082 271496', SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt'),
   ('0500 155536', SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll'),
   ('07208 839252', SELECT person_id FROM person WHERE first_name = 'Nyssa' AND last_name = 'Adkins');
- 
-  ---Instructor---
-INSERT INTO instructor (employment_id, person_id)
+
+
+
+--Contact person phone---
+INSERT INTO contact_phone (phone_num, contact_person_id)
 VALUES
-  ('1774', SELECT person_id FROM person WHERE first_name = 'Lionel' AND last_name = 'Ferrell'),  
-  ('7155', SELECT person_id FROM person WHERE first_name = 'Xander' AND last_name = 'Sellers'),
-  ('2012', SELECT person_id FROM person WHERE first_name = 'Jermaine' AND last_name = 'Gould');
-  
-  
-  ---Instrument Instructor---
-INSERT INTO instrument_instructor (instrument_instructor, instructor_id)
+  ('+46 47 837 24 69', SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright'),
+  ('+46 57 461 90 25', SELECT contact_person_id FROM contact_person WHERE first_name = 'Britanni' AND last_name = 'Wolf'),
+  ('+46 40 638 38 25', SELECT contact_person_id FROM contact_person WHERE first_name = 'Kirestin' AND last_name = 'Baxter'),
+  ('+46 89 325 65 39', SELECT contact_person_id FROM contact_person WHERE first_name = 'Jakeem' AND last_name = 'Ashley');
+
+
+
+---Student---
+INSERT INTO student (level_skills, contact_person_id, person_id)
 VALUES
-  ('guitar',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
-  ('flute',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
-  ('trumpet',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
-  ('guitar', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
-  ('flute', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
-  ('trumpet', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
-  ('guitar', SELECT instructor_id FROM instructor WHERE employment_id = '2012'),
-  ('flute', SELECT instructor_id FROM instructor WHERE employment_id = '2012'),
-  ('trumpet', SELECT instructor_id FROM instructor WHERE employment_id = '2012');
+  ('beginner', SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright', SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims'),
+  ('intermediate',  SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright', SELECT person_id FROM person WHERE first_name = 'Wang' AND last_name = 'Pickett'),
+  ('advanced', SELECT contact_person_id FROM contact_person WHERE first_name = 'Jakeem' AND last_name = 'Ashley', SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt'),
+  ('beginner', SELECT contact_person_id FROM contact_person WHERE first_name = 'Kirestin' AND last_name = 'Baxter', SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll'),
+  ('intermediate', SELECT contact_person_id FROM contact_person WHERE first_name = 'Britanni' AND last_name = 'Wolf', SELECT person_id FROM person WHERE first_name = 'Nyssa' AND last_name = 'Adkins');
+
+
+
+---Sibling--- -- need to be checked-- 
+INSERT INTO sibling_student (sibling_student_id, student_id)
+VALUES
+  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett'),
+  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt');
+
+
+
+---Student Lesson---
+INSERT INTO student_lesson (student_id, lesson_id)
+VALUES
+  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 1879), --individual
+  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', 2001),
+  (SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt', 7195),
+  (SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett', 1667), --group lesson
+  (SELECT student_id FROM student WHERE first_name = 'Nyssa' AND last_name = 'Adkins', 1667),
+  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 1667),
+  (SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett', 1667),-- ensemble 
+  (SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt', 1667),
+  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', 1667),
+  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 3626);
+
+
 
 
 ---Instructor Availbility---
@@ -66,96 +151,57 @@ VALUES
 
 
 
----Student---
-INSERT INTO student (level_skills, contact_person_id, person_id)
-VALUES
-  ('beginner', SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright', SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims'),
-  ('intermediate',  SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright', SELECT person_id FROM person WHERE first_name = 'Wang' AND last_name = 'Pickett'),
-  ('advanced', SELECT contact_person_id FROM contact_person WHERE first_name = 'Jakeem' AND last_name = 'Ashley', SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt'),
-  ('beginner', SELECT contact_person_id FROM contact_person WHERE first_name = 'Kirestin' AND last_name = 'Baxter', SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll'),
-  ('intermediate', SELECT contact_person_id FROM contact_person WHERE first_name = 'Britanni' AND last_name = 'Wolf', SELECT person_id FROM person WHERE first_name = 'Nyssa' AND last_name = 'Adkins');
 
-
----Contact Person---
-INSERT INTO contact_person (first_name, last_name, personal_num)
-VALUES
-  ('Walker', 'Wright', '366664815'),
-  ('Jakeem', 'Ashley', '313977692'),
-  ('Kirestin', 'Baxter', '491662182'),
-  ('Britanni', 'Wolf', '216042409');
-
---Contact person phone---
-INSERT INTO contact_phone (phone_num, contact_person_id)
-VALUES
-  ('+46 47 837 24 69', SELECT contact_person_id FROM contact_person WHERE first_name = 'Walker' AND last_name = 'Wright'),
-  ('+46 57 461 90 25', SELECT contact_person_id FROM contact_person WHERE first_name = 'Britanni' AND last_name = 'Wolf'),
-  ('+46 40 638 38 25', SELECT contact_person_id FROM contact_person WHERE first_name = 'Kirestin' AND last_name = 'Baxter'),
-  ('+46 89 325 65 39', SELECT contact_person_id FROM contact_person WHERE first_name = 'Jakeem' AND last_name = 'Ashley');
-
----Sibling--- -- need to be checked-- 
-INSERT INTO sibling_student (sibling_student_id, student_id)
-VALUES
-  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett'),
-  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt');
-
-
+--WHY DO WE HAVE 2 RENTALS?
 ---Rental---
 INSERT INTO rental (starting_date, ending_date, student_id)
 VALUES
   ('Apr 30, 2024', 'Apr 30, 2025', SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims'),
   ('Nov 01, 2024', 'Nov 01, 2025', SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll');
-
----Student Lesson---
-INSERT INTO student_lesson (student_id, lesson_id)
+--rental ---
+INSERT INTO rental (starting_date, ending_date, student_id)
 VALUES
-  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 1879), --individual
-  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', 2001),
-  (SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt', 7195),
-  (SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett', 1667), --group lesson
-  (SELECT student_id FROM student WHERE first_name = 'Nyssa' AND last_name = 'Adkins', 1667),
-  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 1667),
-  (SELECT student_id FROM student WHERE first_name = 'Wang' AND last_name = 'Pickett', 1667),-- ensemble 
-  (SELECT student_id FROM student WHERE first_name = 'Hayes' AND last_name = 'Wyatt', 1667),
-  (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll', 1667),
-  (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims', 3626);
+  ('Apr 30, 2024', 'Apr 30, 2025', SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims'),
+  ('Nov 01, 2024', 'Nov 01, 2025', SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll');
 
----Lesson---
-INSERT INTO lesson (instructor_id, price_list_id)
-VALUES
-  ((SELECT instructor_id FROM instructor WHERE employment_id = '1774'), (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
-      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson')
-      AND skill_level_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), --individual
-  ((SELECT instructor_id FROM instructor WHERE employment_id = '7155'),  (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
-      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')
-      AND skill_level_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), --group lesson
-  ((SELECT instructor_id FROM instructor WHERE employment_id = '2012'),  (SELECT price_list_id FROM price_list WHERE lesson_type_id = 
-      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')
-      AND skill_level_id = null)); -- ensemble 
 
----Price List---
-INSERT INTO price_list (price, lesson_type_lookup_id, skill_level_lookup_id, date_price)
-VALUES
-  ('$3.25', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner', 'Apr 23, 2024'),
-  ('$89.19',SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'intermediate', 'Apr 23, 2024'),
-  ('$81.79', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'advanced', 'Apr 23, 2024'),
-  ('$68.47', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner', 'Apr 23, 2024'),
-  ('$49.93',  SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'intermediate', 'Apr 23, 2024'),
-  ('$96.52', SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson' , SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'advanced', 'Apr 23, 2024'),
-  ('$7.31',  SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble', null , 'Apr 23, 2024');
 
----Lesson Type Lookup---
-INSERT INTO lesson_type_lookup (lesson_type)
+---Instrument---
+INSERT INTO instrument (rental_price, instrument_name,  type_of_instrument, brand, quantity)
 VALUES
-  ('individual_lesson'),
-  ('group_lesson'),
-  ('ensemble'),
+  ('$6.78', 'flute' , 'woodWind', 'Buffet', 10),
+  ('$5.57', 'guitar','string', 'Ludwig', 10),
+  ('$6.50', 'trumpet' ,'brass', 'Fox', 10);
 
----Skill Level Lookup---
-INSERT INTO skill_level_lookup (skill_level)
+
+
+---Rental Instrument---
+INSERT INTO rental_instrument (rental_id, instrument_id)
 VALUES
-  ('beginner'),
-  ('intermediate'),
-  ('advanced'),
+  ((SELECT rental_id FROM rental WHERE student_id = (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims')), (SELECT instrument_id FROM instrument WHERE instrument_name = 'guitar')),
+  ((SELECT rental_id FROM rental WHERE student_id = (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll')), (SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'));
+
+
+
+
+
+  ---Instrument Instructor---
+INSERT INTO instrument_instructor (instrument_instructor, instructor_id)
+VALUES
+  ('guitar',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
+  ('flute',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
+  ('trumpet',  SELECT instructor_id FROM instructor WHERE employment_id = '1774'),
+  ('guitar', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
+  ('flute', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
+  ('trumpet', SELECT instructor_id FROM instructor WHERE employment_id = '7155'),
+  ('guitar', SELECT instructor_id FROM instructor WHERE employment_id = '2012'),
+  ('flute', SELECT instructor_id FROM instructor WHERE employment_id = '2012'),
+  ('trumpet', SELECT instructor_id FROM instructor WHERE employment_id = '2012');
+
+
+
+
+
 
 ---Ensemble---
 INSERT INTO ensemble (lesson_id, genre, min_num_of_students, max_num_of_students)
@@ -163,19 +209,17 @@ VALUES
   (SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')), 'Opera', 3, 10);
 
 
+
+
 ---Group Lesson---
 INSERT INTO group_lesson (lesson_id, min_num_of_students, constant, instrument_used, skill_level_lookup_id)
 VALUES
   (SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-            (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = 
-                                                                          (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')), 3, 10, 'Bassoon', (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'));
----Time Slot---
-INSERT INTO time_slot (start_time, end_time, date_slot, lesson_id)
-VALUES
-  ('1:00 PM', '3:00 PM', 'Jan 26, 2025', SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-            (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = 
-                                                                          (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), 
-  ('2:00 PM', '4:00 PM', 'Jan 26, 2025', SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')));
+      (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = 
+            (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')), 3, 10, 'Bassoon', (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'));
+
+
+
 
 ---Individual Lesson---
 INSERT INTO individual_lesson (lesson_id, instrument, skill_level_id)
@@ -183,22 +227,17 @@ VALUES
   (SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
             (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson') AND skill_level_lookup_id = 
                                                                           (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')), 'Bassoon', (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'));
---rental ---
-INSERT INTO rental (starting_date, ending_date, student_id)
+
+
+
+
+---Time Slot---
+INSERT INTO time_slot (start_time, end_time, date_slot, lesson_id)
 VALUES
-  ('Apr 30, 2024', 'Apr 30, 2025', SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims'),
-  ('Nov 01, 2024', 'Nov 01, 2025', SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll');
----Rental Instrument---
-INSERT INTO rental_instrument (rental_id, instrument_id)
-VALUES
-  ((SELECT rental_id FROM rental WHERE student_id = (SELECT student_id FROM student WHERE first_name = 'Chancellor' AND last_name = 'Sims')), (SELECT instrument_id FROM instrument WHERE instrument_name = 'guitar')),
-  ((SELECT rental_id FROM rental WHERE student_id = (SELECT student_id FROM student WHERE first_name = 'Allistair' AND last_name = 'Carroll')), (SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'));
----Instrument---
-INSERT INTO instrument (rental_price, instrument_name,  type_of_instrument, brand, quantity)
-VALUES
-  ('$6.78', 'flute' , 'woodWind', 'Buffet', 10),
-  ('$5.57', 'guitar','string', 'Ludwig', 10),
-  ('$6.50', 'trumpet' ,'brass', 'Fox', 10);
+  ('1:00 PM', '3:00 PM', 'Jan 26, 2025', SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
+            (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = 
+                                                                          (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner'))), 
+  ('2:00 PM', '4:00 PM', 'Jan 26, 2025', SELECT lesson_id FROM lesson WHERE price_list_id = (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')));
 
 
 

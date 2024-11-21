@@ -30,7 +30,7 @@ CREATE TABLE price_list(
     price_list_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     price VARCHAR(50) NOT NULL,    
     lesson_type_lookup_id INT NOT NULL,
-    skill_level_lookup_id INT NOT NULL,  
+    skill_level_lookup_id INT,  
     date_price DATE NOT NULL,
     FOREIGN KEY (lesson_type_lookup_id) REFERENCES lesson_type_lookup(lesson_type_lookup_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE
@@ -59,10 +59,10 @@ CREATE TABLE phone(
 );
 
 CREATE TABLE contact_phone(
-    phone_nb          VARCHAR(50) NOT NULL,
+    phone_num          VARCHAR(50) NOT NULL,
     contact_person_id INT NOT NULL,
     FOREIGN KEY (contact_person_id) REFERENCES contact_person(contact_person_id) ON DELETE CASCADE,
-    PRIMARY KEY(phone_nb, contact_person_id)
+    PRIMARY KEY(phone_num, contact_person_id)
 );
 
 CREATE TABLE student(
@@ -147,10 +147,10 @@ CREATE TABLE ensemble(
 
 CREATE TABLE group_lesson(
     lesson_id INT NOT NULL,
-    skill_level_lookup_id INT NOT NULL,
     min_num_of_students INT NOT NULL,
     max_num_of_students INT NOT NULL,   
     instrument_used VARCHAR(500),
+    skill_level_lookup_id INT NOT NULL,
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
     PRIMARY KEY(lesson_id),
@@ -159,6 +159,7 @@ CREATE TABLE group_lesson(
 
 CREATE TABLE individual_lesson(
     lesson_id INT NOT NULL,
+    instrument VARCHAR(50) NOT NULL,
     skill_level_lookup_id INT NOT NULL,
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_level_lookup_id) REFERENCES skill_level_lookup(skill_level_lookup_id) ON DELETE CASCADE,
@@ -166,13 +167,13 @@ CREATE TABLE individual_lesson(
 );
 
 CREATE TABLE time_slot(
-    starting_time TIME NOT NULL,
-    ending_time TIME NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
     date_slot DATE NOT NULL,
     lesson_id INT NOT NULL,
     FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE,
-    PRIMARY KEY(starting_time, ending_time, date_slot, lesson_id),
-    CHECK(starting_time < ending_time)
+    PRIMARY KEY(start_time, end_time, date_slot, lesson_id),
+    CHECK(start_time < end_time)
 );
 
 CREATE OR REPLACE FUNCTION rental_instruments_limit()

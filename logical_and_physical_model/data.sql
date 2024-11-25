@@ -177,43 +177,43 @@ VALUES
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims')), 
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson')))), -- individual lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'individual_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')), 
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')))), -- group lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))), 
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt')), -- Hayes Wyatt
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')))), -- group lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Wang' AND last_name = 'Pickett')),        --Wang Pickett
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')))), -- group lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))), 
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Nyssa' AND last_name = 'Adkins')),        --Nyssa Adkins
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')))), -- group lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims')), 
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson')))), -- group lesson
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'group_lesson') AND skill_level_lookup_id = (SELECT skill_level_lookup_id FROM skill_level_lookup WHERE skill_level = 'beginner')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Wang' AND last_name = 'Pickett')),        --Wang Pickett
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))), -- ensemble
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt')),  -- Hayes Wyatt
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))), -- ensemble
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))), 
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')), 
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))), -- ensemble
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))),
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims')), 
    (SELECT lesson_id FROM lesson WHERE price_list_id = 
        (SELECT price_list_id FROM price_list WHERE lesson_type_lookup_id = 
-           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))); -- ensemble
+           (SELECT lesson_type_lookup_id FROM lesson_type_lookup WHERE lesson_type = 'ensemble')))); 
 
 
 ---Ensemble---

@@ -2,6 +2,7 @@
 -- lessons summary --
 SELECT
     TO_CHAR(ts.date_slot, 'Mon') AS Month, -- Extract the month from the date
+	COUNT(*) AS lesson,
     SUM(CASE WHEN l.lesson_id = il.lesson_id THEN 1 ELSE 0 END) AS Individual, -- Count individual lessons
     SUM(CASE WHEN l.lesson_id = gl.lesson_id THEN 1 ELSE 0 END) AS Group, -- Count group lessons
     SUM(CASE WHEN l.lesson_id = e.lesson_id THEN 1 ELSE 0 END) AS Ensemble -- Count ensemble lessons
@@ -14,7 +15,7 @@ LEFT JOIN time_slot ts ON l.lesson_id = ts.lesson_id -- Include date info for gr
 GROUP BY
     TO_CHAR(ts.date_slot, 'Mon'), EXTRACT(MONTH FROM ts.date_slot) -- Group by month
 ORDER BY
-    Month;
+    Month DESC;
 
 
 

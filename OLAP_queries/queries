@@ -1,5 +1,5 @@
 
--- lessons summary --
+-- query 1
 SELECT
     TO_CHAR(ts.date_slot, 'Mon') AS Month, -- Extract the month from the date
 	COUNT(*) AS lesson, -- Total number of lessons
@@ -12,55 +12,61 @@ LEFT JOIN individual_lesson il ON l.lesson_id = il.lesson_id
 LEFT JOIN group_lesson gl ON l.lesson_id = gl.lesson_id
 LEFT JOIN ensemble e ON l.lesson_id = e.lesson_id
 LEFT JOIN time_slot ts ON l.lesson_id = ts.lesson_id -- Include date info for grouping
-WHERE EXTRACT(YEAR FROM ts.date_slot) = EXTRACT(YEAR FROM CURRENT_DATE) -- this script ensure that only lessons in this year are displaysed 
 GROUP BY
     TO_CHAR(ts.date_slot, 'Mon'), EXTRACT(MONTH FROM ts.date_slot) -- Group by month
 ORDER BY Month DESC;
 
 
+--query 2
 
--- student and siblings----- 
-
-CREATE VIEW stud_sib_num AS 
+CREATE VIEW nb_of_siblings AS 
     SELECT 
         s.student_id, 
-        COUNT(ss.sibling_student_id) AS sibling_count
-    FROM student s
-    LEFT JOIN sibling_student ss ON s.student_id = ss.student_id
-    GROUP BY s.student_id
+        --count siblings per student
+        (SELECT COUNT(*) 
+         FROM sibling_student ss 
+         WHERE ss.student_id = s.student_id) AS sib_count
+    FROM student s;
 
 SELECT 
-    sibling_count AS "No of Siblings", 
+    sib_count AS "No of Siblings",   
     COUNT(*) AS "No of Students"
-FROM stud_sib_num
-GROUP BY sibling_count
-ORDER BY sibling_count;
+FROM nb_of_siblings
+GROUP BY sib_count
+ORDER BY sib_count ASC;
 
 
---- instructor course ---
 
- CREATE VIEW lessons_monthly AS
+--query 3
+CREATE VIEW lessons_per_month AS
     SELECT
         l.instructor_id,
+        -- A beginner might perform unnecessary computations such as separate YEAR and MONTH extractions
         COUNT(*) AS lesson_count
     FROM lesson l
     INNER JOIN time_slot ts ON l.lesson_id = ts.lesson_id
     WHERE EXTRACT(MONTH FROM ts.date_slot) = EXTRACT(MONTH FROM CURRENT_DATE)
       AND EXTRACT(YEAR FROM ts.date_slot) = EXTRACT(YEAR FROM CURRENT_DATE)
-    GROUP BY l.instructor_id
+    GROUP BY l.instructor_id;
+
 
 SELECT
-    i.instructor_id,
-    p.first_name,
-    p.last_name,
-    lm.lesson_count AS "No of Lessons"
-FROM lessons_monthly lm
-INNER JOIN instructor i
-    ON lm.instructor_id = i.instructor_id
-INNER JOIN person p
-    ON i.person_id = p.person_id
-WHERE lm.lesson_count > 0
-ORDER BY lm.lesson_count DESC;
+    lmon.instructor_id,
+    -- get instructor names
+    (SELECT p.first_name 
+     FROM instructor i 
+     JOIN person p ON i.person_id = p.person_id
+     WHERE i.instructor_id = lmon.instructor_id) 
+	 	AS first_name,
+    (SELECT p.last_name 
+     FROM instructor i 
+     JOIN person p ON i.person_id = p.person_id
+     WHERE i.instructor_id = lmon.instructor_id) 
+	 	AS last_name,
+    lmon.lesson_count AS "No of Lessons"
+FROM lessons_per_month lmon
+WHERE lmon.lesson_count > 0
+ORDER BY lmon.lesson_count DESC;
 
 
 --- ensemble queries ---

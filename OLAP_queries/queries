@@ -12,6 +12,7 @@ LEFT JOIN individual_lesson il ON l.lesson_id = il.lesson_id
 LEFT JOIN group_lesson gl ON l.lesson_id = gl.lesson_id
 LEFT JOIN ensemble e ON l.lesson_id = e.lesson_id
 LEFT JOIN time_slot ts ON l.lesson_id = ts.lesson_id -- Include date info for grouping
+WHERE EXTRACT(YEAR FROM ts.date_slot) = EXTRACT(YEAR FROM CURRENT_DATE) -- this script ensure that only lessons in this year are displaysed 
 GROUP BY
     TO_CHAR(ts.date_slot, 'Mon'), EXTRACT(MONTH FROM ts.date_slot) -- Group by month
 ORDER BY Month DESC;

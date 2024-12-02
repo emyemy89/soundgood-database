@@ -26,8 +26,8 @@ SELECT
   price_list.price AS price,
   ensemble.genre AS genre, 
   CASE 
-        WHEN individual_lesson.lesson_id IS NOT NULL THEN individual_lesson.instrument  -- Get instrument for individual lessons
-        WHEN group_lesson.lesson_id IS NOT NULL THEN group_lesson.instrument_used  -- Get instrument for group lessons
+        WHEN individual_lesson.lesson_id IS NOT NULL THEN individual_lesson.instrument  
+        WHEN group_lesson.lesson_id IS NOT NULL THEN group_lesson.instrument_used 
         ELSE NULL  --no instrument for ensemble
     END AS instrument,
   person.first_name AS student_first_name,

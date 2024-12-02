@@ -21,12 +21,11 @@ ORDER BY Month DESC;
 
 CREATE VIEW nb_of_siblings AS 
     SELECT 
-        s.student_id, 
-        --count siblings per student
-        (SELECT COUNT(*) 
-         FROM sibling_student ss 
-         WHERE ss.student_id = s.student_id) AS sib_count
-    FROM student s;
+        student.student_id, 
+        COUNT(ss.student_id) AS sib_count --count siblings directly using a JOIN
+    FROM student 
+    LEFT JOIN sibling_student ss ON ss.student_id = student.student_id
+    GROUP BY student.student_id;
 
 SELECT 
     sib_count AS "No of Siblings",   
@@ -40,34 +39,23 @@ ORDER BY sib_count ASC;
 --query 3
 CREATE VIEW lessons_per_month AS
     SELECT
-        l.instructor_id,
-        -- A beginner might perform unnecessary computations such as separate YEAR and MONTH extractions
+        lesson.instructor_id,
         COUNT(*) AS lesson_count
-    FROM lesson l
-    INNER JOIN time_slot ts ON l.lesson_id = ts.lesson_id
-    WHERE EXTRACT(MONTH FROM ts.date_slot) = EXTRACT(MONTH FROM CURRENT_DATE)
-      AND EXTRACT(YEAR FROM ts.date_slot) = EXTRACT(YEAR FROM CURRENT_DATE)
-    GROUP BY l.instructor_id;
-
+    FROM lesson 
+    INNER JOIN time_slot ts ON lesson.lesson_id = ts.lesson_id
+	WHERE TO_CHAR(ts.date_slot, 'YYYY-MM') = TO_CHAR(CURRENT_DATE, 'YYYY-MM')
+    GROUP BY lesson.instructor_id;
 
 SELECT
     lmon.instructor_id,
-    -- get instructor names
-    (SELECT p.first_name 
-     FROM instructor i 
-     JOIN person p ON i.person_id = p.person_id
-     WHERE i.instructor_id = lmon.instructor_id) 
-	 	AS first_name,
-    (SELECT p.last_name 
-     FROM instructor i 
-     JOIN person p ON i.person_id = p.person_id
-     WHERE i.instructor_id = lmon.instructor_id) 
-	 	AS last_name,
+    person.first_name,
+    person.last_name,
     lmon.lesson_count AS "No of Lessons"
 FROM lessons_per_month lmon
+JOIN instructor i ON lmon.instructor_id = i.instructor_id
+JOIN person ON i.person_id = person.person_id
 WHERE lmon.lesson_count > 0
 ORDER BY lmon.lesson_count DESC;
-
 
 --- ensemble queries ---
 WITH next_week_ensembles AS (

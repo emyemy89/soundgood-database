@@ -1,4 +1,4 @@
-CREATE TABLE lesson_type_lookup(
+REATE TABLE lesson_type_lookup(
     lesson_type_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lesson_type VARCHAR(50) NOT NULL
 );
@@ -111,6 +111,9 @@ CREATE TABLE rental(
     )
 );
 
+
+
+
 CREATE TABLE instrument(
     instrument_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     rental_price VARCHAR(50),
@@ -120,22 +123,23 @@ CREATE TABLE instrument(
     quantity     INT NOT NULL CHECK(quantity > 0)
 );
 
--- CREATE TABLE rental_instrument(
---     rental_id INT NOT NULL,
---     instrument_id INT NOT NULL,
---     FOREIGN KEY (rental_id) REFERENCES rental(rental_id) ON DELETE CASCADE,
---     FOREIGN KEY (instrument_id) REFERENCES instrument(instrument_id) ON DELETE SET NULL,
---     PRIMARY KEY(rental_id, instrument_id)
--- );
+CREATE TABLE individual_instrument(
+    individual_instrument_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    instrument_id INT NOT NULL,
+    serial_number VARCHAR(50) UNIQUE NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'available', -- available, rented
+    FOREIGN KEY (instrument_id) REFERENCES instrument(instrument_id) ON DELETE CASCADE
+);
 
 
-
-CREATE TABLE rental_instrument( 
-  rental_id INT NOT NULL, 
-  individual_instrument_id INT NOT NULL, 
-  FOREIGN KEY (rental_id) REFERENCES rental(rental_id) ON DELETE CASCADE, 
-  FOREIGN KEY (individual_instrument_id) REFERENCES individual_instrument(individual_instrument_id) ON DELETE SET NULL, 
-  PRIMARY KEY(rental_id, individual_instrument_id) 
+CREATE TABLE rental_instrument(
+    rental_id INT NOT NULL,
+    individual_instrument_id INT NOT NULL,
+    student_id INT NOT NULL, 
+    FOREIGN KEY (rental_id) REFERENCES rental(rental_id) ON DELETE CASCADE,
+    FOREIGN KEY (individual_instrument_id) REFERENCES individual_instrument(individual_instrument_id) ON DELETE SET NULL,
+    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE,
+    PRIMARY KEY(rental_id, individual_instrument_id)
 );
 
 
@@ -187,44 +191,3 @@ CREATE TABLE time_slot(
     PRIMARY KEY(start_time, end_time, date_slot, lesson_id),
     CHECK(start_time < end_time)
 );
-
-
-
-CREATE TABLE individual_instrument(
-    individual_instrument_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    instrument_id INT NOT NULL,
-    serial_number VARCHAR(50) UNIQUE NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'available', -- available, rented
-    FOREIGN KEY (instrument_id) REFERENCES instrument(instrument_id) ON DELETE CASCADE
-);
-
-
-
-
-CREATE OR REPLACE FUNCTION rental_instruments_limit()
-RETURNS TRIGGER AS $$
-DECLARE instrument_count INT;
-BEGIN
-    SELECT COUNT(rental_instrument.individual_instrument_id)
-    INTO instrument_count
-    FROM rental_instrument
-    JOIN rental ON rental_instrument.rental_id = rental.rental_id
-    WHERE rental.student_id = (
-        SELECT student_id FROM rental WHERE rental_id = NEW.rental_id
-    ) AND rental.starting_date <= (
-        SELECT ending_date FROM rental WHERE rental_id = NEW.rental_id
-    ) AND rental.ending_date >= (
-        SELECT starting_date FROM rental WHERE rental_id = NEW.rental_id
-    );
-    -- if the student tries to rent more than 2:
-    IF (instrument_count >= 2) THEN
-        RAISE EXCEPTION 'MAXIMUM NUMBER OF RENTED INSTRUMENTS IS 2 PER STUDENT!';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER rental_instruments_limit_trigger
-BEFORE INSERT ON rental_instrument
-FOR EACH ROW
-EXECUTE FUNCTION rental_instruments_limit();

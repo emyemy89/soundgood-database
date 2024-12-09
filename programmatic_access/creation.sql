@@ -1,4 +1,4 @@
-REATE TABLE lesson_type_lookup(
+CREATE TABLE lesson_type_lookup(
     lesson_type_lookup_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lesson_type VARCHAR(50) NOT NULL
 );

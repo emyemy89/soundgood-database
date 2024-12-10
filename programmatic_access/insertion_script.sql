@@ -150,9 +150,15 @@ VALUES
   ((SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')), (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Hayes' AND last_name = 'Wyatt')));
 
 
-INSERT INTO rental (starting_date, ending_date, student_id) VALUES 
-('2024-04-30', '2025-04-30', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims'))),
-('2024-11-01', '2025-11-01', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')));
+-- INSERT INTO rental (starting_date, ending_date, student_id) VALUES 
+-- ('2024-04-30', '2025-04-30', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims'))),
+-- ('2024-11-01', '2025-11-01', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')));
+
+INSERT INTO rental (starting_date, ending_date, student_id, status) VALUES 
+('2024-04-30', '2025-04-30', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Chancellor' AND last_name = 'Sims')), 'active'),
+('2024-11-01', '2025-11-01', (SELECT student_id FROM student WHERE person_id = (SELECT person_id FROM person WHERE first_name = 'Allistair' AND last_name = 'Carroll')), 'active');
+
+
 ---Lesson---
 INSERT INTO lesson (instructor_id, price_list_id)
 VALUES

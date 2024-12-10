@@ -105,6 +105,7 @@ CREATE TABLE rental(
     starting_date DATE NOT NULL,
     ending_date   DATE NOT NULL,
     student_id INT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'active', -- New status column
     FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE,
     CONSTRAINT lease_max_duration CHECK (
         (ending_date - starting_date)/30 <= 12

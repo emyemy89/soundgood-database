@@ -105,14 +105,12 @@ CREATE TABLE rental(
     starting_date DATE NOT NULL,
     ending_date   DATE NOT NULL,
     student_id INT NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'active', -- New status column
+    status VARCHAR(50) NOT NULL DEFAULT 'active', 
     FOREIGN KEY(student_id) REFERENCES student(student_id) ON DELETE CASCADE,
     CONSTRAINT lease_max_duration CHECK (
         (ending_date - starting_date)/30 <= 12
     )
 );
-
-
 
 
 CREATE TABLE instrument(
@@ -128,7 +126,7 @@ CREATE TABLE individual_instrument(
     individual_instrument_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     instrument_id INT NOT NULL,
     serial_number VARCHAR(50) UNIQUE NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'available', -- available, rented
+    status VARCHAR(50) NOT NULL DEFAULT 'available', -- available/ rented
     FOREIGN KEY (instrument_id) REFERENCES instrument(instrument_id) ON DELETE CASCADE
 );
 

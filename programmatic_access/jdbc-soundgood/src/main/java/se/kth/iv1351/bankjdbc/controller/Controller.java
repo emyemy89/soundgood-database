@@ -46,15 +46,6 @@ public class Controller {
 
     private final RentalManager rentalManager; 
 
-    /**
-     * Creates a new instance, and retrieves a connection to the database.
-     *
-     * @throws SoundgoodDBException If unable to connect to the database.
-     */
-    // public Controller() throws SoundgoodDBException {
-    //     soundgood = new SoundgoodDAO();
-    // }
-
    /** 
     * * Creates a new instance, and retrieves a connection to the database. 
     * * 
@@ -69,10 +60,10 @@ public class Controller {
     /** 
      * 
      * * Creates a new instance with a given RentalManager. 
-    * * @param rentalManager The RentalManager to use. 
+    * * @param rentalManager The RentalManager to use for business constaint 
     */ 
     public Controller(RentalManager rentalManager) throws SoundgoodDBException { 
-        this.soundgood = new SoundgoodDAO(); // Initialize soundgood in both constructors 
+        this.soundgood = new SoundgoodDAO(); 
         this.rentalManager = rentalManager; 
     }
 
@@ -86,7 +77,7 @@ public class Controller {
      */
     public List<InstrumentDTO> getAvailableInstruments(String instrumentName) throws InstrumentException, SoundgoodDBException {
         try {
-            List<InstrumentDTO> instruments = soundgood.readAvailableInstruments(instrumentName);
+            List<InstrumentDTO> instruments= soundgood.readAvailableInstruments(instrumentName);
             try{
                 soundgood.commit();
             }catch(SoundgoodDBException e){
@@ -96,17 +87,17 @@ public class Controller {
         }
         catch (SoundgoodDBException e) {
                 soundgood.rollback();
-                throw new InstrumentException("Could not list available instruments: " + instrumentName, e);
+                throw new InstrumentException("Could not list available instruments: "+ instrumentName, e);
             }
     }
 
     /**
       * Rents an instrument to a student
       * 
-      * @param studentId       The ID of the student renting the instrument
+      * @param studentId       The id of the student renting the instrument
       * @param InstrumentDTO   The instrument to rent
       * @throws RentalRejectedException If unable to rent it
-     * @throws SoundgoodDBException
+     * @throws SoundgoodDBException If problem arises with rentalManager
       */
     public void rentInstrument(int studentId, InstrumentDTO instrument) throws RentalRejectedException, SoundgoodDBException { 
         String failureMsg = "Could not rent instrument: " + instrument.getSerialNumber() + " to student: " + studentId; 
@@ -134,7 +125,7 @@ public class Controller {
      /**
       * Terminates an ongoing rental.
       * 
-      * @param rentalId                  the ID of rental to terminate
+      * @param rentalId                  the id of rental to terminate
       * @param InstrumentDTO             the instrument
       * @throws RentalRejectedException  if unable to terminate the rental
       */
@@ -192,7 +183,12 @@ public class Controller {
     }
 
 
-    
+    /**
+    * Usd to commit a transaction
+    *
+    *@param failureMsg                 Error to print
+    *@throws RentedRejectedException   Along with failure message if an error occurs
+    */
     private void commitOngoingTransaction(String failureMsg) throws RentalRejectedException {
         try {
             soundgood.commit();
@@ -201,6 +197,11 @@ public class Controller {
         }
     }
 
+    /**
+    * Usd to rollback a transaction
+    *
+    *@throws RentedRejectedException   If an error occurs
+    */
     private void rollbackOngoingTransaction() throws RentalRejectedException { 
         try { 
             soundgood.rollback(); 

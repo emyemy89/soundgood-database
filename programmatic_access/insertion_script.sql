@@ -269,8 +269,12 @@ VALUES
 INSERT INTO individual_instrument (instrument_id, serial_number, status)
 VALUES
   ((SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'), 'FL123456', 'available'),
+  ((SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'), 'AB123456', 'available'),
+  ((SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'), 'CD123456', 'available'),
+  ((SELECT instrument_id FROM instrument WHERE instrument_name = 'flute'), 'EF123456', 'available'),
   ((SELECT instrument_id FROM instrument WHERE instrument_name = 'guitar'), 'GT123456', 'available'),
   ((SELECT instrument_id FROM instrument WHERE instrument_name = 'trumpet'), 'TP123456', 'available');
+
 
 
 

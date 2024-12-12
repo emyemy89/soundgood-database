@@ -38,7 +38,7 @@ import se.kth.iv1351.bankjdbc.model.InstrumentDTO;
 
 /**
  * This data access object (DAO) encapsulates all database calls in the music rental
- * application. No code outside this class shall have any knowledge about the database.
+ * application. No code outside this class shall have any knowledge about the database !!
  */   
     
 public class SoundgoodDAO {
@@ -85,8 +85,8 @@ public class SoundgoodDAO {
     }
 
     private void connectToMusicSchoolDB() throws ClassNotFoundException, SQLException {
-        connection = DriverManager.getConnection("jdbc:postgresql://localhost:5433/soundgood1",
-                "postgres", "vreaulamare123");
+        connection = DriverManager.getConnection("jdbc:postgresql://localhost:5433/<name_of_databse>",
+                "<user_name>", "<password>");
         connection.setAutoCommit(false);
     }
 
@@ -102,7 +102,7 @@ public class SoundgoodDAO {
     
         rentInstrumentStmt = connection.prepareStatement(
             "INSERT INTO " + RENTAL_TABLE_NAME + " (" + "starting_date, " + RENTAL_END_DATE_COLUMN_NAME + ", " + STUDENT_ID_COLUMN_NAME + ") VALUES (CURRENT_DATE, CURRENT_DATE + INTERVAL '1 year', ?)",
-            PreparedStatement.RETURN_GENERATED_KEYS
+            PreparedStatement.RETURN_GENERATED_KEYS // generated PK
         );
     
         insertRentalInstrumentStmt = connection.prepareStatement(
@@ -111,7 +111,9 @@ public class SoundgoodDAO {
     
 
         updateStatusStmt = connection.prepareStatement(
-            "UPDATE " + INSTRUMENT_TABLE_NAME + " SET " + STATUS_COLUMN_NAME + " = ? WHERE " + INSTRUMENT_ID_COLUMN_NAME + " = ?"
+            "UPDATE " + INSTRUMENT_TABLE_NAME + " 
+            SET " + STATUS_COLUMN_NAME + " = ? 
+            WHERE " + INSTRUMENT_ID_COLUMN_NAME + " = ?"
         );
 
         updateRentalStatusStmt = connection.prepareStatement( 
@@ -144,27 +146,33 @@ public class SoundgoodDAO {
 
 
 
+    /* *
+    * Finds the instruments that are aavilable at the present moment.
+    *
+    *@param instrumentName            Name of the instrument.
+    *@throws SoundgoodDBException    If the instrument is not found.
+    */
     public List<InstrumentDTO> readAvailableInstruments(String instrumentName) throws SoundgoodDBException {
         String failureMsg = "Could not list instruments.";
-        ResultSet result = null;
+        ResultSet res = null;
         List<InstrumentDTO> instruments = new ArrayList<>();
         try {
-            result = listAvailableInstrumentsStmt.executeQuery();
-            while (result.next()) {
+            res = listAvailableInstrumentsStmt.executeQuery();
+            while (res.next()) {
                 Instrument instrument = new Instrument(
-                    result.getInt(INSTRUMENT_ID_COLUMN_NAME),
-                    result.getString(SERIAL_NUMBER_COLUMN_NAME),
-                    result.getString(INSTRUMENT_NAME_COLUMN_NAME),
-                    result.getString(BRAND_COLUMN_NAME),
-                    result.getString(RENTAL_PRICE_COLUMN_NAME),
-                    result.getString(STATUS_COLUMN_NAME)
+                    res.getInt(INSTRUMENT_ID_COLUMN_NAME),
+                    res.getString(SERIAL_NUMBER_COLUMN_NAME),
+                    res.getString(INSTRUMENT_NAME_COLUMN_NAME),
+                    res.getString(BRAND_COLUMN_NAME),
+                    res.getString(RENTAL_PRICE_COLUMN_NAME),
+                    res.getString(STATUS_COLUMN_NAME)
                 );
                 instruments.add(instrument);
             }
         } catch (SQLException sqle) {
             handleException(failureMsg, sqle);
         } finally {
-            closeResultSet(failureMsg, result);
+            closeResultSet(failureMsg, res);
         }
         return instruments;
     }
@@ -172,12 +180,24 @@ public class SoundgoodDAO {
 
 
 
-    // NEXT 4 METHODS ARE USED FOR RENTING AN INSTRUMENT
+    // NEXT 4 METHODS ARE USED FOR RENTING AN INSTRUMENT:
+    
+    /* *
+    * Creates a rental
+    *
+    *@param studentId the id of the student making the rental
+    *@throws SQLException
+    */
     public void createRental(int studentId) throws SQLException {
         rentInstrumentStmt.setInt(1, studentId);
         rentInstrumentStmt.executeUpdate();
     }
-    
+
+    /* *
+    * Creates a rental id
+    *
+    *@throws SQLException
+    */
     public int getGeneratedRentalId() throws SQLException {
         ResultSet generatedKeys = rentInstrumentStmt.getGeneratedKeys();
         if (generatedKeys.next()) {
@@ -186,14 +206,29 @@ public class SoundgoodDAO {
             throw new SQLException("Failed to retrieve rental ID.");
         }
     }
-    
+
+    /* 
+    * Inserts the new data to the table rental_instrument
+    *
+    *@param rentalId             The id of the rental 
+    *@param instrumentId         The id of the instrument being rented.
+    *@param studentId            The id of the student making the rental. 
+    *@throws SQLException
+    */
     public void insertRentalInstrument(int rentalId, int instrumentId, int studentId) throws SQLException {
         insertRentalInstrumentStmt.setInt(1, rentalId);
         insertRentalInstrumentStmt.setInt(2, instrumentId);
         insertRentalInstrumentStmt.setInt(3, studentId);
         insertRentalInstrumentStmt.executeUpdate();
     }
-    
+
+    /* *
+    *Updates the status of the rented instrument to 'rented'
+    *
+    *@param instrumentId         The id of the instrument being rented.
+    *@param status               The status column of the specific instrument. 
+    *@throws SQLException
+    */
     public void updateInstrumentStatus(int instrumentId, String status) throws SQLException {
         updateStatusStmt.setString(1, status);
         updateStatusStmt.setInt(2, instrumentId);
@@ -205,12 +240,25 @@ public class SoundgoodDAO {
 
 
         // NEXT 2 METHODS ARE FOR TERMINATING A RENTAL
+    /* *
+    *Updates the status of the previously rented instrument to 'available'
+    *
+    *@param instrumentId         The id of the instrument that was rented.
+    *@throws SQLException
+    */
     public void updateInstrumentStatusToAvailable(int instrumentId) throws SQLException {
         updateStatusToAvailableStmt.setInt(1, instrumentId);
         updateStatusToAvailableStmt.executeUpdate();
     }
 
 
+    /* *
+    *Updates the status of the rental as 'termianted'
+    *
+    *@param rentalId             The id of the rental. 
+    *@param status              The status of the specific rental.
+    *@throws SQLException
+    */
     public void updateRentalStatus(int rentalId, String status) throws SQLException {
         updateRentalStatusStmt.setString(1, status);
         updateRentalStatusStmt.setInt(2, rentalId);
@@ -219,10 +267,14 @@ public class SoundgoodDAO {
     
     
 
-    
-    
-    
+     
 
+    /* *
+    * Finds an instrument given its serial number
+    *
+    *@param serialNumber            The serial number of the instrumetn that needs to be found.
+    *@throws SoundgoodDBException    If the instrument is not found.
+    */
     public InstrumentDTO readInstrumentBySerialNumber(String serialNumber) throws SoundgoodDBException {
         String failureMsg = "Could not find instrument with serial number: " + serialNumber;
         ResultSet result = null;
@@ -255,6 +307,12 @@ public class SoundgoodDAO {
 
     
 
+    /* *
+    * Finds the number of active rentals a student has
+    *
+    *@param studentId            The id of the student.
+    *@throws SoundgoodDBException    If the the number of rentals can not be counted.
+    */
     public int readRentalCountByStudent(int studentId) throws SoundgoodDBException {
         String failureMsg = "Could not count rentals.";
         ResultSet result = null;

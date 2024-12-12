@@ -39,10 +39,10 @@ public class Instrument implements InstrumentDTO {
     /**
      * Creates a new instance representing an instrument.
      *
-     * @param instrumentId The ID of the instrument.
+     * @param   instrumentId The ID of the instrument.
      * @param serialNumber The serial number of the instrument.
-     * @param instrumentName The name of the instrument.
-     * @param brand The brand of the instrument.
+     * @param  instrumentName The name of the instrument.
+     * @param   brand The brand of the instrument.
      * @param rentalPrice The rental price of the instrument.
      * @param status The status of the instrument (e.g., available or rented).
      */

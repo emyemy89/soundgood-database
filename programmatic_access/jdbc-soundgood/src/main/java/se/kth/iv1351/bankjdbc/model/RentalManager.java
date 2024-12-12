@@ -22,21 +22,4 @@ public class RentalManager {
         }
     }
 
-    // public void rentInstrument(int studentId, InstrumentDTO instrument) throws RentalRejectedException, SoundgoodDBException {
-    //     String failureMsg = "Could not rent instrument: " + instrument.getSerialNumber() + " to student: " + studentId;
-    //     try {
-    //         int instrumentId = instrument.getInstrumentId();
-    //         if (instrumentId == 0) {
-    //             throw new RentalRejectedException("Can't find instrument.");
-    //         }
-
-    //         // Perform the rental operations
-    //         soundgood.createRental(studentId);
-    //         int rentalId = soundgood.getGeneratedRentalId();
-    //         soundgood.insertRentalInstrument(rentalId, instrumentId, studentId);
-    //         soundgood.updateInstrumentStatus(instrumentId, "rented");
-    //     } catch (SQLException e) {
-    //         throw new RentalRejectedException(failureMsg, e);
-    //     }
-    // }
 }

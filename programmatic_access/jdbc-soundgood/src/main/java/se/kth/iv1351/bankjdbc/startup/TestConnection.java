@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class TestConnection {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://localhost:5433/soundgood";
-        String user = "postgres";
-        String password = "vreaulamare123";
+        String url = "jdbc:postgresql://localhost:5433/<name_of_dabase>";
+        String user = "<user_namw>";
+        String password = "<password>";
 
         try (Connection con = DriverManager.getConnection(url, user, password)) {
             if (con != null) {

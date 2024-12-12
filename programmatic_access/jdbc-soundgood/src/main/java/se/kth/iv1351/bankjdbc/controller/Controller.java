@@ -77,7 +77,7 @@ public class Controller {
      */
     public List<InstrumentDTO> getAvailableInstruments(String instrumentName) throws InstrumentException, SoundgoodDBException {
         try {
-            List<InstrumentDTO> instruments= soundgood.readAvailableInstruments(instrumentName);
+            List<InstrumentDTO> instruments = soundgood.readAvailableInstrumentsByType(instrumentName);
             try{
                 soundgood.commit();
             }catch(SoundgoodDBException e){
@@ -87,7 +87,7 @@ public class Controller {
         }
         catch (SoundgoodDBException e) {
                 soundgood.rollback();
-                throw new InstrumentException("Could not list available instruments: "+ instrumentName, e);
+                throw new InstrumentException("Could not list available instruments: " + instrumentName, e);
             }
     }
 

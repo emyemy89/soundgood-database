@@ -59,7 +59,6 @@ public class SoundgoodDAO {
     
 
     private Connection connection;
-    private PreparedStatement listAvailableInstrumentsStmt;
     private PreparedStatement rentInstrumentStmt;
     private PreparedStatement findInstrumentByNameStmt;
     private PreparedStatement findRentalsByStudentStmt;
@@ -70,6 +69,7 @@ public class SoundgoodDAO {
     private PreparedStatement updateStatusToAvailableStmt;
 
     private PreparedStatement updateRentalStatusStmt;
+    private PreparedStatement listAvailableInstrumentsByTypeStmt;
 
 
 
@@ -93,11 +93,11 @@ public class SoundgoodDAO {
     
 
     private void prepareStatements() throws SQLException {
-        listAvailableInstrumentsStmt = connection.prepareStatement(
+        listAvailableInstrumentsByTypeStmt = connection.prepareStatement(
             "SELECT i." + INSTRUMENT_ID_COLUMN_NAME + ", i." + SERIAL_NUMBER_COLUMN_NAME + ", it." + INSTRUMENT_NAME_COLUMN_NAME + ", it." + BRAND_COLUMN_NAME + ", it." + RENTAL_PRICE_COLUMN_NAME + ", i." + STATUS_COLUMN_NAME + " " +
             "FROM " + INSTRUMENT_TABLE_NAME + " i " +
             "JOIN instrument it ON i." + INSTRUMENT_COLUMN_ID + " = it." + INSTRUMENT_COLUMN_ID + " " +
-            "WHERE i." + STATUS_COLUMN_NAME + " = 'available' FOR NO KEY UPDATE "
+            "WHERE i." + STATUS_COLUMN_NAME + " = 'available' AND it." + INSTRUMENT_NAME_COLUMN_NAME + " = ? FOR NO KEY UPDATE"
         );
     
         rentInstrumentStmt = connection.prepareStatement(
@@ -147,36 +147,36 @@ public class SoundgoodDAO {
 
 
     /* *
-    * Finds the instruments that are aavilable at the present moment.
+    * Finds the instruments of a certain type that are aavilable at the present moment.
     *
-    *@param instrumentName            Name of the instrument.
+    *@param instrumentype            Type of the instrument.
     *@throws SoundgoodDBException    If the instrument is not found.
     */
-    public List<InstrumentDTO> readAvailableInstruments(String instrumentName) throws SoundgoodDBException {
+    public List<InstrumentDTO> readAvailableInstrumentsByType(String instrumentType) throws SoundgoodDBException {
         String failureMsg = "Could not list instruments.";
-        ResultSet res = null;
         List<InstrumentDTO> instruments = new ArrayList<>();
+        ResultSet result = null;
+    
         try {
-            res = listAvailableInstrumentsStmt.executeQuery();
-            while (res.next()) {
-                Instrument instrument = new Instrument(
-                    res.getInt(INSTRUMENT_ID_COLUMN_NAME),
-                    res.getString(SERIAL_NUMBER_COLUMN_NAME),
-                    res.getString(INSTRUMENT_NAME_COLUMN_NAME),
-                    res.getString(BRAND_COLUMN_NAME),
-                    res.getString(RENTAL_PRICE_COLUMN_NAME),
-                    res.getString(STATUS_COLUMN_NAME)
-                );
-                instruments.add(instrument);
+            listAvailableInstrumentsByTypeStmt.setString(1, instrumentType);
+            result = listAvailableInstrumentsByTypeStmt.executeQuery();
+            while (result.next()) {
+                instruments.add(new Instrument(
+                    result.getInt(INSTRUMENT_ID_COLUMN_NAME),
+                    result.getString(SERIAL_NUMBER_COLUMN_NAME),
+                    result.getString(INSTRUMENT_NAME_COLUMN_NAME),
+                    result.getString(BRAND_COLUMN_NAME),
+                    result.getString(RENTAL_PRICE_COLUMN_NAME),
+                    result.getString(STATUS_COLUMN_NAME)
+                ));
             }
         } catch (SQLException sqle) {
             handleException(failureMsg, sqle);
         } finally {
-            closeResultSet(failureMsg, res);
+            closeResultSet(failureMsg, result);
         }
         return instruments;
     }
-
 
 
 

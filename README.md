@@ -26,16 +26,25 @@ Ensure you have **PostgreSQL** or any compatible SQL database installed.
 
 ### Installation  
 
-1. Clone the repository:  
+1. Clone the repository:
+
+   
    git clone https://github.com/emyemy89/soundgood-database.git
+
    cd soundgood-database
 
-2. Set up the database:
+3. Set up the database:
+
+   
    psql -U your_user -d your_database -f logical_and_physical_model/creation.sql
 
-3. Insert sample data
+4. Insert sample data
+
+   
    psql -U your_user -d your_database -f logical_and_physical_model/data.sql
 
    
-5. Run predefined OLAP queries using:
+6. Run predefined OLAP queries using:
+
+   
    psql -U your_user -d your_database -f OLAP_queries/Queries.sql
